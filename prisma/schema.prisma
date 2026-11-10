@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Loomategelane, kes last tegevuse juures saadab.
+model Animal {
+  id        String   @id @default(cuid())
+  /// Eestikeelne põhinimi; tõlkefail võib selle slug-i järgi üle kirjutada.
+  name      String
+  slug      String   @unique
+  imagePath String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  sessions ActivitySession[]
+
+  @@index([isActive, sortOrder])
+}
+
+/// Igapäevane tegevus, mida laps taimeriga teeb.
+model Activity {
+  id          String   @id @default(cuid())
+  /// Eestikeelne põhinimi; tõlkefail võib selle slug-i järgi üle kirjutada.
+  name        String
+  slug        String   @unique
+  description String
+  imagePath   String
+  /// Kaardi värviteema võti (vt lib/themes.ts).
+  color       String   @default("sky")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  sessions ActivitySession[]
+
+  @@index([isActive, sortOrder])
+}
+
+/// Lõpuni tehtud tegevus. Katkestatud taimereid siia ei salvestata.
+model ActivitySession {
+  id              String   @id @default(cuid())
+  /// Brauseris loodud tunnus ühe taimerikorra kohta; väldib topeltsalvestust.
+  clientSessionId String   @unique
+  /// Anonüümne seadme tunnus; ajalugu on seadmepõhine.
+  deviceId        String
+  activityId      String
+  animalId        String
+  durationSeconds Int
+  completedAt     DateTime
+  createdAt       DateTime @default(now())
+
+  // Restrict: tegevust või looma ei saa kustutada, kui ajalugu sellele viitab.
+  // Peitmiseks kasuta isActive = false, siis jääb ajalugu alles.
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Restrict)
+  animal   Animal   @relation(fields: [animalId], references: [id], onDelete: Restrict)
+
+  @@index([deviceId, completedAt(sort: Desc)])
+}

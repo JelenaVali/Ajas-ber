@@ -1,0 +1,18 @@
+# sõltuvused
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# keskkonnamuutujad (saladused ei kuulu GitHubi)
+.env
+.env.*
+!.env.example
+
+# muu
+.DS_Store
+npm-debug.log*
+coverage/
