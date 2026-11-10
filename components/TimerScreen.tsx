@@ -110,11 +110,8 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
     <main
       className={`flex min-h-dvh flex-col items-center justify-between gap-4 px-4 py-5 sm:py-8 ${theme.card}`}
     >
-      <div className="flex w-full max-w-3xl items-center justify-between gap-3">
-        <h1 className={`text-2xl font-extrabold sm:text-3xl ${theme.text}`}>
-          {activityName(activity, messages)}
-        </h1>
-        <div className="flex items-center gap-2">
+      <div className="flex w-full max-w-3xl flex-col gap-2">
+        <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={onExit}
@@ -125,6 +122,9 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
           </button>
           <SoundToggle />
         </div>
+        <h1 className={`text-center text-2xl font-extrabold sm:text-3xl ${theme.text}`}>
+          {activityName(activity, messages)}
+        </h1>
       </div>
 
       <div className={`relative w-[min(84vw,48vh)] ${theme.text}`}>
