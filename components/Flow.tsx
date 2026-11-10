@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Check, History, Minus, Play, Plus } from "lucide-react";
 import { AnimalFigure } from "@/components/AnimalFigure";
@@ -34,9 +34,16 @@ export function Flow({ activities, animals }: Props) {
   const [animal, setAnimal] = useState<AnimalItem | null>(null);
   const [minutes, setMinutes] = useState(DEFAULT_MINUTES);
 
-  // Iga uus ekraan algab ülevalt.
+  // Iga uus ekraan algab ülevalt ja fookus liigub selle pealkirjale, et
+  // klaviatuuri ja ekraanilugeriga kasutaja ei jääks eelmise ekraani juurde.
+  const firstRender = useRef(true);
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    document.querySelector<HTMLElement>("main h1")?.focus({ preventScroll: true });
   }, [step]);
 
   const startOver = () => {
@@ -110,7 +117,7 @@ export function Flow({ activities, animals }: Props) {
           <p
             aria-live="polite"
             aria-label={`${messages.time.selected}: ${minutesLabel(minutes, messages)}`}
-            className="min-w-44 text-center text-4xl font-extrabold sm:text-5xl"
+            className="w-48 text-center text-4xl font-extrabold sm:w-64 sm:text-5xl"
           >
             {minutesLabel(minutes, messages)}
           </p>
@@ -181,7 +188,7 @@ export function Flow({ activities, animals }: Props) {
         <SoundToggle />
       </nav>
       <header className="text-center">
-        <h1 className="text-5xl font-extrabold tracking-tight text-lavender-deep sm:text-6xl">
+        <h1 tabIndex={-1} className="text-5xl font-extrabold tracking-tight text-lavender-deep outline-none sm:text-6xl">
           {messages.app.name}
         </h1>
         <p className="mt-2 text-2xl font-bold sm:text-3xl">{messages.app.greeting}</p>
@@ -237,7 +244,9 @@ function StepHeader({ title, onBack }: { title: string; onBack: () => void }) {
         <ArrowLeft aria-hidden="true" className="size-7" strokeWidth={3} />
         {messages.steps.back}
       </button>
-      <h1 className="flex-1 text-center text-3xl font-extrabold sm:text-4xl">{title}</h1>
+      <h1 tabIndex={-1} className="flex-1 text-center text-3xl font-extrabold outline-none sm:text-4xl">
+        {title}
+      </h1>
       <SoundToggle />
     </header>
   );

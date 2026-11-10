@@ -229,3 +229,31 @@ button:disabled {
     display: none;
   }
 }
+
+/* ---------- Taimeri ekraani paigutus ----------
+   Püstises vaates: päis, ring, numbrid, nupud. Ring saab ülejäänud ruumi.
+   Madalas põikvaates (telefon külili): ring vasakul, kõik muu paremal. */
+.aj-timer {
+  display: grid;
+  height: 100dvh;
+  min-height: 30rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "head" "ring" "clock" "ctrl";
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1rem;
+}
+.aj-timer-scene {
+  width: 62%;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .aj-timer {
+    min-height: 19rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "ring head" "ring clock" "ring ctrl";
+    align-items: center;
+    column-gap: 1.5rem;
+  }
+}
