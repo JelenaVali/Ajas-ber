@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, X } from "lucide-react";
 import { AnimalFigure } from "@/components/AnimalFigure";
 import { ProgressRing } from "@/components/ProgressRing";
 import { Scene } from "@/components/Scene";
+import { SoundToggle } from "@/components/SoundToggle";
+import { saveSession } from "@/lib/api";
+import { completionPayload, shouldPlayChime } from "@/lib/completion";
+import { newUuid } from "@/lib/deviceId";
 import { activityName, animalName, getMessages } from "@/lib/i18n";
+import { isSoundOn, playChime, unlockAudio } from "@/lib/sound";
 import { getTheme } from "@/lib/themes";
 import { formatClock } from "@/lib/timer";
 import type { ActivityItem, AnimalItem } from "@/lib/types";
@@ -38,13 +43,37 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
     () => messages.done.praises[Math.floor(Math.random() * messages.done.praises.length)],
   );
 
+  // Ühe taimerikorra tunnus: server salvestab sama tunnusega kirje ainult korra.
+  const [clientSessionId] = useState(newUuid);
+  const completionHandled = useRef(false);
+
+  // Taimeri lõpp: heli ja salvestamine toimuvad täpselt üks kord. Kiitus ei
+  // oota salvestamist ja salvestamise viga lapsele ei näidata.
+  useEffect(() => {
+    if (completionHandled.current) return;
+    const payload = completionPayload(
+      { status: timer.status, finishedAt: timer.finishedAt },
+      {
+        clientSessionId,
+        activityId: activity.id,
+        animalId: animal.id,
+        durationSeconds: minutes * 60,
+      },
+    );
+    if (!payload) return;
+    completionHandled.current = true;
+    if (shouldPlayChime(isSoundOn(), payload.completedAt, Date.now())) playChime();
+    void saveSession(payload);
+  }, [timer.status, timer.finishedAt, clientSessionId, activity.id, animal.id, minutes]);
+
   const title = `${animalName(animal, messages)} – ${activityName(activity, messages)}`;
 
   if (timer.status === "finished") {
     return (
-      <section
+      <main
         className={`relative flex min-h-dvh flex-col items-center justify-center gap-6 overflow-hidden px-4 py-8 text-center ${theme.card}`}
       >
+        <SoundToggle className="absolute right-4 top-4 z-10" />
         <div aria-hidden="true">
           {CONFETTI.map((piece, index) => (
             <span
@@ -71,28 +100,31 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
         >
           {messages.done.next}
         </button>
-      </section>
+      </main>
     );
   }
 
   const paused = timer.status === "paused";
 
   return (
-    <section
+    <main
       className={`flex min-h-dvh flex-col items-center justify-between gap-4 px-4 py-5 sm:py-8 ${theme.card}`}
     >
       <div className="flex w-full max-w-3xl items-center justify-between gap-3">
         <h1 className={`text-2xl font-extrabold sm:text-3xl ${theme.text}`}>
           {activityName(activity, messages)}
         </h1>
-        <button
-          type="button"
-          onClick={onExit}
-          className="aj-press flex min-h-14 items-center gap-2 rounded-full bg-white/80 px-5 text-lg font-bold shadow-sm"
-        >
-          <X aria-hidden="true" className="size-6" />
-          {messages.timer.finish}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onExit}
+            className="aj-press flex min-h-16 items-center gap-2 rounded-full bg-white px-5 text-lg font-bold shadow-sm"
+          >
+            <X aria-hidden="true" className="size-6" />
+            {messages.timer.finish}
+          </button>
+          <SoundToggle />
+        </div>
       </div>
 
       <div className={`relative w-[min(84vw,48vh)] ${theme.text}`}>
@@ -125,7 +157,11 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
       <div className="flex w-full max-w-xl flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
         <button
           type="button"
-          onClick={paused ? timer.resume : timer.pause}
+          onClick={() => {
+            unlockAudio();
+            if (paused) timer.resume();
+            else timer.pause();
+          }}
           className={`aj-press flex min-h-20 flex-1 items-center justify-center gap-3 rounded-full px-8 text-3xl font-extrabold text-white shadow-lg ${theme.solid}`}
         >
           {paused ? (
@@ -144,6 +180,6 @@ export function TimerScreen({ activity, animal, minutes, onExit }: Props) {
           {messages.timer.restart}
         </button>
       </div>
-    </section>
+    </main>
   );
 }

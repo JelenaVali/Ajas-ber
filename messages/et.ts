@@ -10,6 +10,7 @@ export const et = {
   },
   home: {
     chooseActivity: "Vali tegevus",
+    history: "Minu tegevused",
   },
   steps: {
     chooseAnimal: "Vali sõber",
@@ -35,6 +36,26 @@ export const et = {
   done: {
     praises: ["Tubli!", "Sa said hakkama!", "Väga hästi tehtud!"],
     next: "Vali järgmine tegevus",
+  },
+  sound: {
+    on: "Heli on sees. Vajuta, et välja lülitada.",
+    off: "Heli on väljas. Vajuta, et sisse lülitada.",
+  },
+  history: {
+    title: "Minu tegevused",
+    loading: "Laadin tegevusi…",
+    today: "Täna",
+    yesterday: "Eile",
+    emptyTitle: "Siin pole veel midagi",
+    emptyBody: "Kui taimer saab täis, ilmub tegevus siia.",
+    chooseActivity: "Vali tegevus",
+    loadError: "Tegevusi ei saanud praegu laadida.",
+    clear: "Tühjenda ajalugu",
+    confirmTitle: "Kas kustutame kõik tegevused?",
+    confirmBody: "Kustutatud tegevusi ei saa tagasi.",
+    keep: "Jäta alles",
+    remove: "Kustuta",
+    clearError: "Kustutamine ei õnnestunud. Ajalugu jäi alles.",
   },
   errors: {
     loadTitle: "Oih, midagi läks viltu",

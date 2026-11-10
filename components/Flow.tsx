@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, Minus, Play, Plus } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Check, History, Minus, Play, Plus } from "lucide-react";
 import { AnimalFigure } from "@/components/AnimalFigure";
 import { Scene } from "@/components/Scene";
+import { SoundToggle } from "@/components/SoundToggle";
 import { TimerScreen } from "@/components/TimerScreen";
 import {
   clampMinutes,
@@ -13,6 +15,7 @@ import {
   PRESET_MINUTES,
 } from "@/lib/duration";
 import { activityName, animalName, getMessages, minutesLabel } from "@/lib/i18n";
+import { unlockAudio } from "@/lib/sound";
 import { getTheme } from "@/lib/themes";
 import type { ActivityItem, AnimalItem } from "@/lib/types";
 
@@ -124,7 +127,11 @@ export function Flow({ activities, animals }: Props) {
 
         <button
           type="button"
-          onClick={() => setStep("timer")}
+          onClick={() => {
+            // Vajutus lubab brauseril hiljem lõpuheli mängida.
+            unlockAudio();
+            setStep("timer");
+          }}
           className={`aj-press mx-auto flex min-h-24 w-full max-w-md items-center justify-center gap-4 rounded-full px-10 text-4xl font-extrabold text-white shadow-lg ${theme.solid}`}
         >
           <Play aria-hidden="true" className="size-10 fill-current" />
@@ -162,7 +169,17 @@ export function Flow({ activities, animals }: Props) {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-10">
+    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-5 px-4 py-5 sm:px-6 sm:py-8">
+      <nav className="flex items-center justify-between gap-3">
+        <Link
+          href="/ajalugu"
+          className="aj-press flex min-h-16 items-center gap-2 rounded-full bg-white px-5 text-lg font-bold shadow-sm"
+        >
+          <History aria-hidden="true" className="size-7" />
+          {messages.home.history}
+        </Link>
+        <SoundToggle />
+      </nav>
       <header className="text-center">
         <h1 className="text-5xl font-extrabold tracking-tight text-lavender-deep sm:text-6xl">
           {messages.app.name}
@@ -221,8 +238,7 @@ function StepHeader({ title, onBack }: { title: string; onBack: () => void }) {
         {messages.steps.back}
       </button>
       <h1 className="flex-1 text-center text-3xl font-extrabold sm:text-4xl">{title}</h1>
-      {/* Tasakaalustab tagasinuppu, et pealkiri jääks keskele. */}
-      <span aria-hidden="true" className="hidden w-32 sm:block" />
+      <SoundToggle />
     </header>
   );
 }
