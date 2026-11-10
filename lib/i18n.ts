@@ -10,6 +10,15 @@ export function getMessages(locale: Locale = defaultLocale): Messages {
   return dictionaries[locale];
 }
 
+/** Kestus sõnadega, näiteks „1 minut" või „3 minutit". */
+export function minutesLabel(
+  minutes: number,
+  messages: Messages = getMessages(),
+): string {
+  const word = minutes === 1 ? messages.time.minuteOne : messages.time.minuteMany;
+  return `${minutes} ${word}`;
+}
+
 /** Tegevuse nimi: tõlkefailist slug-i järgi, muidu andmebaasi põhinimi. */
 export function activityName(
   activity: { slug: string; name: string },

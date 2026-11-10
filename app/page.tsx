@@ -1,71 +1,48 @@
-import { getActiveActivities } from "@/lib/catalog";
-import { activityName, getMessages } from "@/lib/i18n";
-import { getTheme } from "@/lib/themes";
+import { Flow } from "@/components/Flow";
+import { getActiveActivities, getActiveAnimals } from "@/lib/catalog";
+import { getMessages } from "@/lib/i18n";
+import type { ActivityItem, AnimalItem } from "@/lib/types";
 
-// Tegevused tulevad andmebaasist, seega lehte ei ehitata ette valmis.
+// Tegevused ja loomad tulevad andmebaasist, seega lehte ei ehitata ette valmis.
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const messages = getMessages();
 
-  let activities: Awaited<ReturnType<typeof getActiveActivities>> | null = null;
+  let catalog: { activities: ActivityItem[]; animals: AnimalItem[] } | null = null;
   try {
-    activities = await getActiveActivities();
+    const [activities, animals] = await Promise.all([
+      getActiveActivities(),
+      getActiveAnimals(),
+    ]);
+    if (activities.length > 0 && animals.length > 0) {
+      catalog = { activities, animals };
+    }
   } catch (error) {
-    console.error("Tegevuste laadimine ebaõnnestus:", error);
+    console.error("Tegevuste ja loomade laadimine ebaõnnestus:", error);
   }
 
-  return (
-    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
-      <header className="text-center">
-        <h1 className="text-5xl font-extrabold tracking-tight text-lavender-deep sm:text-6xl">
+  if (!catalog) {
+    return (
+      <main className="mx-auto flex min-h-dvh max-w-xl flex-col items-center justify-center gap-6 px-4 py-8 text-center">
+        <h1 className="text-5xl font-extrabold tracking-tight text-lavender-deep">
           {messages.app.name}
         </h1>
-        <p className="mt-3 text-2xl font-semibold sm:text-3xl">
-          {messages.app.greeting}
-        </p>
-      </header>
-
-      {activities === null ? (
-        <section
-          role="alert"
-          className="rounded-3xl bg-pink-soft p-8 text-center shadow-sm"
-        >
-          <h2 className="text-2xl font-bold text-pink-deep">
-            {messages.errors.loadTitle}
-          </h2>
+        <section role="alert" className="w-full rounded-3xl bg-pink-soft p-8 shadow-sm">
+          <h2 className="text-2xl font-bold text-pink-deep">{messages.errors.loadTitle}</h2>
           <p className="mt-2 text-lg">{messages.errors.loadBody}</p>
           {/* Tavaline link: lehe uuesti laadimine proovib andmebaasi uuesti. */}
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/"
-            className="mt-6 inline-block rounded-full bg-white px-8 py-4 text-xl font-bold text-pink-deep shadow"
+            className="mt-6 inline-flex min-h-16 items-center rounded-full bg-white px-8 text-xl font-bold text-pink-deep shadow"
           >
             {messages.errors.retry}
           </a>
         </section>
-      ) : (
-        <section aria-labelledby="choose-activity">
-          <h2 id="choose-activity" className="sr-only">
-            {messages.home.chooseActivity}
-          </h2>
-          <ul className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3">
-            {activities.map((activity) => {
-              const theme = getTheme(activity.color);
-              return (
-                <li
-                  key={activity.id}
-                  className={`flex min-h-36 items-center justify-center rounded-3xl p-5 text-center shadow-sm ${theme.card}`}
-                >
-                  <span className={`text-xl font-bold sm:text-2xl ${theme.text}`}>
-                    {activityName(activity, messages)}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-    </main>
-  );
+      </main>
+    );
+  }
+
+  return <Flow activities={catalog.activities} animals={catalog.animals} />;
 }

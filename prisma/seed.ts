@@ -9,7 +9,8 @@ async function main() {
   for (const [index, animal] of animals.entries()) {
     const data = {
       name: animal.name,
-      imagePath: `/animals/${animal.slug}.svg`,
+      // Illustratsioon on rakenduse sees (components/AnimalFigure.tsx).
+      imagePath: `builtin:${animal.slug}`,
       sortOrder: index,
     };
     await prisma.animal.upsert({
@@ -23,7 +24,8 @@ async function main() {
     const data = {
       name: activity.name,
       description: activity.description,
-      imagePath: `/activities/${activity.slug}.svg`,
+      // Illustratsioon on rakenduse sees (components/ActivityProp.tsx).
+      imagePath: `builtin:${activity.slug}`,
       color: activity.color,
       sortOrder: index,
     };

@@ -11,6 +11,31 @@ export const et = {
   home: {
     chooseActivity: "Vali tegevus",
   },
+  steps: {
+    chooseAnimal: "Vali sõber",
+    chooseTime: "Vali aeg",
+    back: "Tagasi",
+  },
+  time: {
+    minuteOne: "minut",
+    minuteMany: "minutit",
+    less: "Vähem aega",
+    more: "Rohkem aega",
+    selected: "Valitud aeg",
+    start: "Start!",
+  },
+  timer: {
+    timeLeft: "Aega jäänud",
+    pause: "Paus",
+    resume: "Jätka",
+    restart: "Alusta uuesti",
+    finish: "Lõpeta",
+    paused: "Paus",
+  },
+  done: {
+    praises: ["Tubli!", "Sa said hakkama!", "Väga hästi tehtud!"],
+    next: "Vali järgmine tegevus",
+  },
   errors: {
     loadTitle: "Oih, midagi läks viltu",
     loadBody: "Tegevusi ei saanud praegu laadida.",
