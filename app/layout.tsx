@@ -20,7 +20,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="et">
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="min-h-dvh antialiased">
+        {children}
+        {/* Jalus on iga lehe sisu all, et see ei segaks lapse nuppe. */}
+        <footer className="px-4 py-6 text-center text-sm font-semibold text-ink/70">
+          {messages.footer.text}
+        </footer>
+      </body>
     </html>
   );
 }

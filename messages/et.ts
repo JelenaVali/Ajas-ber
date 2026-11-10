@@ -8,6 +8,9 @@ export const et = {
     description:
       "Mänguline taimer, mis aitab lastel igapäevaseid tegevusi ajastada.",
   },
+  footer: {
+    text: "© 2026 Ajas-ber. Built with Claude Code",
+  },
   home: {
     chooseActivity: "Vali tegevus",
     history: "Minu tegevused",
